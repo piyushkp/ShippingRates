@@ -29,7 +29,7 @@ Fedex Credentials
     Fedex_account_number = '510087046'
     Fedex_meter = '118564789'
     Fedex_testmode = true  #for production set it as false
-```    
+   
 UPS Credentials
     Ups_access_license_number = '9CA349F0CB25A9DB'
     Ups_user_id = 'piyushkp'
@@ -45,15 +45,17 @@ For Production change the credentials for UPS and Fedex and set
 
 ##Functions information:
 1.	To get the Fedex and UPS rate information use following function
+
 ```ruby
 def Shipping_Info (fromZipCode, toZipCode, weight)
-```
+
 Input parameters:
 
 fromZipCode = source zipcode
 toZipCode	= destination zipcode
 weight	= package weight in LBS
 
+```
 Which return the array of Fedex and UPS rates 
 ```ruby
 output = []                          
