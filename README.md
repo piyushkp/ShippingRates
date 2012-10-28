@@ -62,15 +62,15 @@ Which return the array of Fedex and UPS rates
 output = []                          
 puts output = [fedex_rates, ups_rates]
 ```
-2.	To get the Transit time for Fedex Ground Service use following function:
+2.	To get the Transit time for Fedex Ground Service use following function
 ```ruby
 def getFedexTransitTime(fromZipCode, toZipCode, weight)
 ```
-3.	To get the Transit time for UPS Ground  Service use following function:
+3.	To get the Transit time for UPS Ground  Service use following function
 ```ruby
 def getUPSTransitTime(fromZipCode, toZipCode, weight)
 ```
-4.	To get the state for given postcode for USA use following function:
+4.	To get the state for given postcode for USA use following function
 ```ruby
 def state_from_zip(zip)
 ```
