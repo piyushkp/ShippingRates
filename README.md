@@ -15,7 +15,10 @@ c.	To Install the Ups_time_in_transit gem, execute following command
 ```ruby
 gem install ups_time_in_transit
 ```
-ups_time_in_transit.rb has been modified so copy the given ups_time_in_transit.rb file to install location e.g. ‘C:\RailsInstaller\Ruby1.9.3\lib\ruby\gems\1.9.1\gems\ups_time_in_transit-0.1.1\lib’ 
+ups_time_in_transit.rb has been modified so copy the given ups_time_in_transit.rb file to install location
+
+e.g. ‘C:\RailsInstaller\Ruby1.9.3\lib\ruby\gems\1.9.1\gems\ups_time_in_transit-0.1.1\lib’ 
+
 Note: Above path can be different based on the rails installation path.
 
 2.	Use ShippingRates.rb to get the rates for Fedex and UPS
@@ -63,14 +66,17 @@ output = []
 puts output = [fedex_rates, ups_rates]
 ```
 2.	To get the Transit time for Fedex Ground Service use following function
+
 ```ruby
 def getFedexTransitTime(fromZipCode, toZipCode, weight)
 ```
 3.	To get the Transit time for UPS Ground  Service use following function
+
 ```ruby
 def getUPSTransitTime(fromZipCode, toZipCode, weight)
 ```
 4.	To get the state for given postcode for USA use following function
+
 ```ruby
 def state_from_zip(zip)
 ```
