@@ -3,6 +3,7 @@ ShippingRates
 
 ##Steps to deploy the Shipping Rate:
 1.	Install the dependent gems
+
 a.	To Install the Active_Shipping gem, execute following command
 ```ruby
 gem install active_shipping
