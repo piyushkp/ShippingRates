@@ -28,8 +28,8 @@ class ShippingInfo
     
     #Shipment Info Start
     
-    packages = [ Package.new(  weight,                        # weight in LBs
-                              [10,5,4],                       # in Inches 
+    packages = [ Package.new( weight * 16,                        # weight in ounce = LB *16
+                              [10,5,4],                           # in Inches 
                               :units => :imperial)         
                ]
 
@@ -53,7 +53,7 @@ class ShippingInfo
     begin                          
     fedex_response = fedex.find_rates(origin, destination, packages)
     fedex_transit_time =  getFedexTransitTime(fromZipCode, toZipCode, weight)
-    fedex_rates =  fedex_response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price, "Transit Time" => fedex_transit_time] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price, "Delivery On" => rate.delivery_date]} 
+    fedex_rates =  fedex_response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Transit Time" => fedex_transit_time] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Delivery On" => rate.delivery_date]} 
     rescue Exception => e
       if (e.message == 'ERROR - 0105: General Error')
         puts 'Fedex Service is temporary not available'
@@ -68,7 +68,7 @@ class ShippingInfo
     ups = ActiveMerchant::Shipping::UPS.new(:login => Ups_user_id, :password => Ups_password, :key => Ups_access_license_number, :test => Ups_testmode)
     response = ups.find_rates(origin, destination, packages)
     ups_business_transit_time = getUPSTransitTime(fromZipCode, toZipCode, weight)
-    ups_rates = response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price, "Transit Time" => ups_business_transit_time] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price, "Delivery On" => rate.delivery_date]}
+    ups_rates = response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Transit Time" => ups_business_transit_time] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Delivery On" => rate.delivery_date]}
     rescue Exception => e
       puts e.message
     end
