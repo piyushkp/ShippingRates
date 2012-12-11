@@ -8,23 +8,30 @@ module ShippingRates
 
 class ShippingInfo
 
+def initialize ()
+  
+ #Origin zipcode
+    @FROM_ZIP_CODE = 90210
+    
  #Fedex Credentials
-    Fedex_key = 'Uo5ehu0ZVJIkwN4y'
-    Fedex_password = 'KXOH9K5coupax3FF4bM1opp9M'
-    Fedex_account_number = '510087046'
-    Fedex_meter = '118564789'
-    Fedex_testmode = true  #for production set it as false
+    @FEDEX_KEY = 'Uo5ehu0ZVJIkwN4y'
+    @FEDEX_PASSWORD = 'KXOH9K5coupax3FF4bM1opp9M'
+    @FEDEX_ACCOUNT_NUMBER = '510087046'
+    @FEDEX_METER = '118564789'
+    @FEDEX_TESTMODE = true  #for production set it as false
     
  #UPS Credentials
-    Ups_access_license_number = '9CA349F0CB25A9DB'
-    Ups_user_id = 'piyushkp'
-    Ups_password = 'Admin123#'
-    Ups_testmode = true  #for production set it as false
-  
- 
- #This function return the rates and deliverytimes for Fedex and UPS for given fromZipcode, toZipCode, and package weight
- def Shipping_Info (fromZipCode, toZipCode, weight)
+    @UPS_ACCESS_LICENSE_NUMBER = '9CA349F0CB25A9DB'
+    @UPS_USER_ID = 'piyushkp'
+    @UPS_PASSWORD = 'Admin123#'
+    @UPS_TESTMODE = true  #for production set it as false
     
+end 
+ 
+  #This function return the rates and deliverytimes for Fedex and UPS for given fromZipcode, toZipCode, and package weight
+  def shipping_info (to_zip_code, weight)
+    
+    initialize();
     
     #Shipment Info Start
     
@@ -34,26 +41,30 @@ class ShippingInfo
                ]
 
     origin = Location.new( :country => 'US',
-                           :zip => fromZipCode)
+                           :zip => @FROM_ZIP_CODE)
 
     destination = Location.new( :country => 'US',
-                                :zip => toZipCode)
+                                :zip => to_zip_code)
     #Shipment Info End
     
     # Fedex Info Start
     
-    fedex = FedEx.new(:key => Fedex_key,
-                      :password => Fedex_password,
-                      :account => Fedex_account_number,
-                      :login => Fedex_meter,
-                      :test => Fedex_testmode
+    fedex = FedEx.new(:key => @FEDEX_KEY,
+                      :password => @FEDEX_PASSWORD,
+                      :account => @FEDEX_ACCOUNT_NUMBER,
+                      :login => @FEDEX_METER,
+                      :test => @FEDEX_TESTMODE
                       )
     fedex_rates = {}
     
     begin                          
+
     fedex_response = fedex.find_rates(origin, destination, packages)
-    fedex_transit_time =  getFedexTransitTime(fromZipCode, toZipCode, weight)
-    fedex_rates =  fedex_response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Transit Time" => fedex_transit_time] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Delivery On" => rate.delivery_date]} 
+
+    #fedex_transit_time =  get_fedex_transit_time(@FROM_ZIP_CODE, to_zip_code, weight)
+
+    fedex_rates =  fedex_response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Transit Time" => get_fedex_transit_time(@FROM_ZIP_CODE, to_zip_code, weight)] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Delivery On" => rate.delivery_date]} 
+
     rescue Exception => e
       if (e.message == 'ERROR - 0105: General Error')
         puts 'Fedex Service is temporary not available'
@@ -64,11 +75,17 @@ class ShippingInfo
     #UPS Info Start
       
     ups_rates = {}
+    
     begin
-    ups = ActiveMerchant::Shipping::UPS.new(:login => Ups_user_id, :password => Ups_password, :key => Ups_access_license_number, :test => Ups_testmode)
+      
+    ups = ActiveMerchant::Shipping::UPS.new(:login => @UPS_USER_ID, :password => @UPS_PASSWORD, :key => @UPS_ACCESS_LICENSE_NUMBER, :test => @UPS_TESTMODE)
+    
     response = ups.find_rates(origin, destination, packages)
-    ups_business_transit_time = getUPSTransitTime(fromZipCode, toZipCode, weight)
-    ups_rates = response.rates.sort_by(&:price).collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Transit Time" => ups_business_transit_time] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Delivery On" => rate.delivery_date]}
+    
+    #ups_ground_transit_time  = get_ups_ground_transit_time(from_zip_code, to_zip_code, weight)
+    
+    ups_rates = response.rates.collect {|rate| rate.delivery_date == nil ? ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Transit Time" => get_ups_ground_transit_time(@FROM_ZIP_CODE, to_zip_code, weight) ] : ["Carrier" => rate.carrier, "Code" => rate.service_name, "Price" => rate.price.to_f/100, "Delivery On" => rate.delivery_date]}
+    
     rescue Exception => e
       puts e.message
     end
@@ -89,13 +106,13 @@ class ShippingInfo
   end
 
   #This function return the Fedex transit time for GROUND service.
-  def getFedexTransitTime(fromZipCode, toZipCode, weight)
+  def get_fedex_transit_time(from_zip_code, to_zip_code, weight)
     
-    fedex_ship = Fedex::Shipment.new(   :key => Fedex_key,
-                                        :password => Fedex_password,
-                                        :account_number => Fedex_account_number,
-                                        :meter => Fedex_meter,
-                                        :mode => Fedex_testmode
+    fedex_ship = Fedex::Shipment.new(   :key => @FEDEX_KEY,
+                                        :password => @FEDEX_PASSWORD,
+                                        :account_number => @FEDEX_ACCOUNT_NUMBER,
+                                        :meter => @FEDEX_METER,
+                                        :mode => @FEDEX_TESTMODE
                                     )
  
     shipping_details = { :packaging_type => "YOUR_PACKAGING",
@@ -112,8 +129,8 @@ class ShippingInfo
                 :phone_number => "555-555-5555",
                 :address => "None",
                 :city => "None",
-                :state => state_from_zip("#{fromZipCode}"),
-                :postal_code => "#{fromZipCode}",
+                :state => state_from_zip("#{from_zip_code}"),
+                :postal_code => "#{from_zip_code}",
                 :country_code => "US" 
               }
             
@@ -122,8 +139,8 @@ class ShippingInfo
                   :phone_number => "555-555-5555",
                   :address => "Main Street",
                   :city => "None",
-                  :state => state_from_zip("#{toZipCode}"),
-                  :postal_code => "#{toZipCode}",
+                  :state => state_from_zip("#{to_zip_code}"),
+                  :postal_code => "#{to_zip_code}",
                   :country_code => "US",
                   :residential => "false" 
                 }
@@ -140,33 +157,29 @@ class ShippingInfo
   end
   
   #This function return the UPS transit time for GROUND service.
-  def getUPSTransitTime(fromZipCode, toZipCode, weight)
+  def get_ups_ground_transit_time(from_zip_code, to_zip_code, weight)
     
     access_options = {
-                        :access_license_number => Ups_access_license_number,
-                        :user_id => Ups_user_id,
-                        :password => Ups_password,
+                        :access_license_number => @UPS_ACCESS_LICENSE_NUMBER,
+                        :user_id => @UPS_USER_ID,
+                        :password => @UPS_PASSWORD,
                         :order_cutoff_time => 17 ,
-                        :sender_state => state_from_zip("#{fromZipCode}"),
+                        :sender_state => state_from_zip("#{from_zip_code}"),
                         :sender_country_code => 'US',
-                        :sender_zip => "#{fromZipCode}"
+                        :sender_zip => "#{from_zip_code}"
                       }
                       
     request_options = {
                         :total_packages => 1,
                         :unit_of_measurement => 'LBS',
                         :weight => weight,
-                        :state => state_from_zip("#{toZipCode}"),
-                        :zip => "#{toZipCode}",
+                        :state => state_from_zip("#{to_zip_code}"),
+                        :zip => "#{to_zip_code}",
                         :country_code => 'US',
-                        :mode => Ups_testmode
+                        :mode => @UPS_TESTMODE
                       }
                         
-    time_in_transit_api = UPS::TimeInTransit.new(access_options)
-    
-    business_transit_days = time_in_transit_api.request(request_options)
-    
-    return business_transit_days   
+    return Integer(UPS::TimeInTransit.new(access_options).request(request_options))   
    
   end
   
@@ -261,7 +274,7 @@ end
 #sample code to call the function
 
 my_object = ShippingRates::ShippingInfo.new
-results = my_object.Shipping_Info "90210", "48503", 10
+results = my_object.shipping_info "48503", 10
 
 
 
