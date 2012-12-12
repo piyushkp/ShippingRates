@@ -52,7 +52,7 @@ For Production change the credentials for UPS and Fedex and set
 1.	To get the Fedex and UPS rate information use following function
 
 ```ruby
-def Shipping_Info (fromZipCode, toZipCode, weight)
+def shipping_info (toZipCode, weight)
 
 Input parameters:
 
@@ -69,12 +69,12 @@ puts output = [fedex_rates, ups_rates]
 2.	To get the Transit time for Fedex Ground Service use following function
 
 ```ruby
-def getFedexTransitTime(fromZipCode, toZipCode, weight)
+def get_fedex_transit_time(fromZipCode, toZipCode, weight)
 ```
 3.	To get the Transit time for UPS Ground  Service use following function
 
 ```ruby
-def getUPSTransitTime(fromZipCode, toZipCode, weight)
+def get_ups_transit_time(fromZipCode, toZipCode, weight)
 ```
 4.	To get the state for given postcode for USA use following function
 
@@ -86,7 +86,7 @@ def state_from_zip(zip)
 Use following code to call the Shipping_Info function:
 ```ruby
 my_object = ShippingRates::ShippingInfo.new
-results = my_object.Shipping_Info "90210", "48503", 10
+results = my_object.shipping_info "48503", 10
 ```
 
 Where 
