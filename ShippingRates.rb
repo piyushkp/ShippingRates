@@ -151,8 +151,10 @@ end
                                         :service_type => "FEDEX_GROUND",
                                         :shipping_details => shipping_details
                                         )
-
-    return fedex_transit_day[:completed_shipment_detail][:operational_detail] [:transit_time]
+    
+    #return fedex_transit_day[:completed_shipment_detail][:operational_detail] [:transit_time]
+    
+    return convert_transit_days_to_number(fedex_transit_day[:completed_shipment_detail][:operational_detail] [:transit_time])
     
   end
   
@@ -266,6 +268,36 @@ end
 
         raise ShippingError, "Invalid zip code"
       end
+  
+  def convert_transit_days_to_number (days)          
+      days = days.to_str
+      {
+        ('ELEVEN_DAYS')   => 11,
+        ('FIFTEEN_DAYS')  => 15,
+        ('FIVE_DAYS')     => 5,
+        ('FOURTEEN_DAYS') => 14,
+        ('FOUR_DAYS')     => 4,
+        ('NINETEEN_DAYS') => 19,
+        ('NINE_DAYS')     => 9,
+        ('ONE_DAY')       => 1,
+        ('SEVENTEEN_DAYS')=> 17,
+        ('SEVEN_DAYS')    => 7,
+        ('SIXTEEN_DAYS')  => 16,
+        ('SIX_DAYS')      => 6,
+        ('TEN_DAYS')      => 10,
+        ('THIRTEEN_DAYS') => 13,
+        ('THREE_DAYS')    => 3,
+        ('TWELVE_DAYS')   => 12,
+        ('TWENTY_DAYS')   => 20,
+        ('TWO_DAYS')      => 2,
+        ('EIGHTEEN_DAYS') => 18,
+        ('EIGHT_DAYS')    => 8
+       }.each do |day, number|
+          return number if day.include? days
+        end
+        
+        raise ShippingError, "Invalid transit time"
+  end
   
 end
 
